@@ -6,18 +6,15 @@
 import colorama
 
 from azure.cli.core import telemetry
-from azure.cli.core import azclierror 
+from azure.cli.core import azclierror
 from knack import log
 from . import constants as const
-from . import bastion_utils 
-
-
-
+from . import bastion_utils
 
 logger = log.get_logger(__name__)
 
-
 # Send target OS type telemetry and check if authentication options are valid for that OS.
+
 def handle_target_machine_properties(cmd, op_info):
 
     properties = get_properties(cmd, op_info.resource_type.lower(), op_info.resource_group_name, op_info.vm_name)
@@ -32,7 +29,7 @@ def handle_target_machine_properties(cmd, op_info):
     check_valid_agent_version(agent_version, op_info)
     return
 
-  
+
 def get_properties(cmd, resource_type, resource_group_name, vm_name):
     if resource_type == "microsoft.compute/virtualmachines":
         return _request_azure_vm_properties(cmd, resource_group_name, vm_name)

@@ -22,7 +22,7 @@ class SSHSession():
                  private_key_file, use_private_ip, local_user, cert_file, port,
                  ssh_client_folder, ssh_args, delete_credentials, resource_type,
                  ssh_proxy_folder, credentials_folder, winrdp, yes_without_prompt, bastion):
-        self.resource_group_name = resource_group_name 
+        self.resource_group_name = resource_group_name
         self.vm_name = vm_name
         self.resource_id = None
         self.ip = ssh_ip

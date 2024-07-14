@@ -21,11 +21,10 @@ from azure.cli.core import azclierror
 
 from azure.cli.core.commands.client_factory import get_subscription_id
 from knack.log import get_logger
-from azure.cli.core.aaz import *
 from knack.prompting import prompt_y_n
 
 
-from .aaz.latest.network.bastion import Create 
+from .aaz.latest.network.bastion import Create
 from .vendored_sdks.resourcegraph._resource_graph_client import ResourceGraphClient
 from . import resource_graph_utils
 from . import ssh_utils
@@ -41,6 +40,7 @@ class BastionSku(Enum):
     QuickConnect = "QuickConnect"
 
 # ============================= Put Call to create a bastion Developer Sku============================= #
+
 def create_bastion(cmd, op_info, vnet_id, vnet_name, vnet_resource_group):
     try:
         bastion_creator = Create(cli_ctx=cmd.cli_ctx)
@@ -57,12 +57,12 @@ def create_bastion(cmd, op_info, vnet_id, vnet_name, vnet_resource_group):
             "tags": {}
         }
         result = bastion_creator(command_args=bastion_args)
-         
+        print(result)
         op_info.bastion_name = f"{vnet_name}-bastion"
     except Exception as e:
         raise azclierror.ClientRequestError(f"Failed to create bastion information")
 
-#============================================== Get call for current bastion ====================================================#
+#================= Get call for current bastion ==========#
 def show_bastion(cmd, op_info):
     from .aaz.latest.network.bastion import Show
     try:
@@ -85,19 +85,21 @@ def ssh_bastion_host(cmd, op_info, delete_keys, delete_cert):
     bastion = show_bastion(cmd, op_info)
 
     if bastion['sku']['name'] not in [BastionSku.Developer.value, BastionSku.QuickConnect.value]:
-        raise azclierror.InvalidArgumentValueError("SSH to Bastion host via Az CLI/PowerShell is only supported for Developer.")
+        raise azclierror.InvalidArgumentValueError("SSH to Bastion host via Az CLI/PowerShell "
+                                                   + "is only supported for Developer.")
 
     if op_info.port != None:
         port = op_info.port
         if port != 22:
-            raise azclierror.InvalidArgumentValueError("Custom Ports are not allowed for the Bastion Developer Sku. Please try again with port 22`.")
-    port = 22 
+            raise azclierror.InvalidArgumentValueError("Custom Ports are not allowed "
+                                                       + "for the Bastion Developer Sku. "
+                                                       +"Please try again with port 22`.")
+    port = 22
 
     target_resource_id = op_info.resource_id
-    
     bastion_endpoint = _get_data_pod(cmd, port, target_resource_id, bastion)
     tunnel_server = _get_tunnel(cmd, bastion, bastion_endpoint, target_resource_id, port)
-    
+
     t = threading.Thread(target=_start_tunnel, args=(tunnel_server,))
     t.daemon = True
     t.start()
@@ -106,7 +108,6 @@ def ssh_bastion_host(cmd, op_info, delete_keys, delete_cert):
                          "-o", "StrictHostKeyChecking=no",
                          "-o", "UserKnownHostsFile=/dev/null",
                          "-o", "LogLevel=Error"])
-                         
 
     try:
         ssh_utils.start_ssh_connection(op_info, delete_keys, delete_cert)

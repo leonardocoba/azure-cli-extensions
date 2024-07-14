@@ -22,26 +22,17 @@ __logger = get_logger(__name__)
 def execute_query(client, graph_query, first, skip, subscriptions, management_groups, allow_partial_scopes, skip_token):
     # type: (ResourceGraphClient, str, int, int, list[str], list[str], bool, str) -> object
     mgs_list = management_groups
-    if mgs_list is not None and len(mgs_list) > __MANAGEMENT_GROUP_LIMIT:
-        mgs_list = mgs_list[:__MANAGEMENT_GROUP_LIMIT]
-        warning_message = "The query included more management groups than allowed. "\
-                          "Only the first {0} management groups were included for the results. "\
-                          "To use more than {0} management groups, "\
-                          "see the docs for examples: "\
-                          "https://aka.ms/arg-error-toomanysubs".format(__MANAGEMENT_GROUP_LIMIT)
-        __logger.warning(warning_message)
-
     subs_list = None
-    if mgs_list is None:
-        subs_list = subscriptions or _get_cached_subscriptions()
-        if subs_list is not None and len(subs_list) > __SUBSCRIPTION_LIMIT:
-            subs_list = subs_list[:__SUBSCRIPTION_LIMIT]
-            warning_message = "The query included more subscriptions than allowed. "\
-                              "Only the first {0} subscriptions were included for the results. "\
-                              "To use more than {0} subscriptions, "\
-                              "see the docs for examples: "\
-                              "https://aka.ms/arg-error-toomanysubs".format(__SUBSCRIPTION_LIMIT)
-            __logger.warning(warning_message)
+
+    subs_list = subscriptions or _get_cached_subscriptions()
+    if subs_list is not None and len(subs_list) > __SUBSCRIPTION_LIMIT:
+        subs_list = subs_list[:__SUBSCRIPTION_LIMIT]
+        warning_message = "The query included more subscriptions than allowed. "\
+                            "Only the first {0} subscriptions were included for the results. "\
+                            "To use more than {0} subscriptions, "\
+                            "see the docs for examples: "\
+                            "https://aka.ms/arg-error-toomanysubs".format(__SUBSCRIPTION_LIMIT)
+        __logger.warning(warning_message)
 
     response = None
     try:

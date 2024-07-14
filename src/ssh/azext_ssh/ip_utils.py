@@ -46,8 +46,8 @@ def get_ssh_ip(cmd, resource_group, vm_name, use_private_ip, bastion):
                     return public_ip["ipAddress"]
             else:
                 prompt = (f"There is no public IP associated with this VM." 
-                    " Would you like to connect to your VM through Developer Bastion? To learn more,"
-                    " please visit learn.microsoft.com/en-us/azure/bastion/quickstart-developer-sku")
+                            " Would you like to connect to your VM through Developer Bastion? To learn more,"
+                            " please visit learn.microsoft.com/en-us/azure/bastion/quickstart-developer-sku")
                 if not prompt_y_n(prompt):
                     logger.info("Connection through Developer Bastion was denied.")
                 else:
