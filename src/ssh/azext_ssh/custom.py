@@ -168,6 +168,7 @@ def _do_ssh_op(cmd, op_info, op_call):
                                                         "IP address to SSH to")
                 if op_info.bastion:
                     logger.info("Bastion Connection approved by user, attempting to connect through Developer Bastion.")
+                    bastion_utils.validate_no_custom_ports(op_info.port)
                 else:
                     raise azclierror.ResourceNotFoundError("Internal Error. Couldn't determine the IP address.")
     # If user provides local user, no credentials should be deleted.

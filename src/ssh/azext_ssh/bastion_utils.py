@@ -87,13 +87,6 @@ def ssh_bastion_host(cmd, op_info, delete_keys, delete_cert):
     if bastion['sku']['name'] not in [BastionSku.Developer.value, BastionSku.QuickConnect.value]:
         raise azclierror.InvalidArgumentValueError("SSH to Bastion host via Az CLI/PowerShell "
                                                    + "is only supported for Developer.")
-
-    if op_info.port != None:
-        port = op_info.port
-        if port != 22:
-            raise azclierror.InvalidArgumentValueError("Custom Ports are not allowed "
-                                                       + "for the Bastion Developer Sku. "
-                                                       +"Please try again with port 22`.")
     port = 22
 
     target_resource_id = op_info.resource_id
@@ -140,7 +133,9 @@ def _get_data_pod(cmd, port, target_resource_id, bastion):
     return response.content.decode("utf-8")
 
 
-
+def validate_no_custom_ports(port):
+    if port != 22:
+        raise azclierror.InvalidArgumentValueError("Custom Ports are not allowed for the Bastion Developer Sku. Please try again with port 22`.")
 
 # ============================= Tunnel Logic ============================= #
 def _get_tunnel(cmd, bastion, bastion_endpoint, vm_id, resource_port, port=None):
